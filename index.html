@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Мастер-оптик · Очки з виїздом</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:#f6f5f3;color:#1a1917;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',Arial,sans-serif;line-height:1.5;min-height:100vh}
+:root{--bg:#f6f5f3;--w:#fff;--border:#e4e1dc;--b2:#ccc9c2;--text:#1a1917;--mu:#7c7a76;--acc:#2563eb;--ach:#1d4ed8;--ok:#16a34a;--sh:0 1px 3px rgba(0,0,0,.06),0 4px 12px rgba(0,0,0,.04)}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:rgba(246,245,243,.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+.logo{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:var(--text)}
+.logo-dot{width:7px;height:7px;border-radius:50%;background:var(--acc);flex-shrink:0}
+.tabs{display:flex;gap:2px;background:var(--border);border-radius:9px;padding:3px}
+.tab{padding:5px 16px;border-radius:6px;border:none;background:none;color:var(--mu);font-size:13px;font-weight:500;cursor:pointer;transition:.18s;font-family:inherit;white-space:nowrap}
+.tab.on{background:var(--w);color:var(--text);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.nav-ph{font-size:13px;color:var(--mu);text-decoration:none;padding:5px 12px;border:1px solid var(--border);border-radius:8px;transition:.18s;white-space:nowrap}
+.nav-ph:hover{color:var(--acc);border-color:var(--acc)}
+@media(max-width:560px){.nav-ph{display:none}}
+
+/* MAIN */
+main{padding-top:56px;min-height:100vh}
+.sec{display:none}.sec.on{display:block}
+
+/* HERO */
+.hero{max-width:580px;margin:0 auto;padding:48px 20px 24px}
+.hero h1{font-size:clamp(26px,5vw,42px);font-weight:800;line-height:1.08;letter-spacing:-.7px;margin-bottom:12px}
+.hero h1 em{color:var(--acc);font-style:normal}
+.hero p{font-size:15px;color:var(--mu);line-height:1.6;max-width:420px}
+
+/* WRAPPERS */
+.wiz{max-width:620px;margin:0 auto;padding:24px 20px 80px}
+.ph{font-size:20px;font-weight:700;letter-spacing:-.3px;margin-bottom:4px}
+.ps{font-size:13px;color:var(--mu);margin-bottom:22px;line-height:1.55}
+
+/* METHOD SELECTOR */
+.mc-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:460px){.mc-grid{grid-template-columns:1fr}}
+.mc{padding:22px 18px;border-radius:14px;border:1.5px solid var(--border);background:var(--w);cursor:pointer;transition:.2s;box-shadow:var(--sh);text-align:center}
+.mc:hover{border-color:var(--acc);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.mc-ico{width:44px;height:44px;border-radius:11px;background:var(--bg);display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+.mc strong{display:block;font-size:15px;font-weight:700;margin-bottom:5px}
+.mc span{font-size:12px;color:var(--mu);line-height:1.5}
+
+/* BACK LINK */
+.back-lnk{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--mu);cursor:pointer;background:none;border:none;font-family:inherit;padding:0;margin-bottom:20px;transition:.16s}
+.back-lnk:hover{color:var(--text)}
+
+/* UPLOAD CTA */
+.upcta{display:flex;align-items:center;gap:12px;padding:16px;background:rgba(37,99,235,.05);border:1.5px dashed var(--acc);border-radius:12px;cursor:pointer;margin-bottom:8px;transition:.18s}
+.upcta:hover{background:rgba(37,99,235,.1)}
+.upcta-ico{width:40px;height:40px;border-radius:9px;background:var(--acc);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.upcta-text strong{display:block;font-size:13px;font-weight:600;color:var(--text)}
+.upcta-text span{font-size:12px;color:var(--mu)}
+.upcta-arrow{margin-left:auto;padding:6px 13px;background:var(--acc);color:#fff;border-radius:7px;font-size:12px;font-weight:600;white-space:nowrap;flex-shrink:0}
+.upname{display:none;margin-bottom:14px;font-size:12px;color:var(--ok);align-items:center;gap:6px;padding:8px 11px;background:rgba(22,163,74,.06);border-radius:8px;border:1px solid rgba(22,163,74,.2)}
+.upname button{margin-left:auto;background:none;border:none;color:var(--mu);cursor:pointer;font-size:15px;line-height:1}
+
+/* STEP BAR */
+.sbar{display:flex;align-items:center;margin-bottom:8px}
+.sd{width:26px;height:26px;border-radius:50%;background:var(--w);border:1.5px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--mu);flex-shrink:0;transition:.22s}
+.sd.on{border-color:var(--acc);color:var(--acc)}
+.sd.dn{background:var(--acc);border-color:var(--acc);color:#fff}
+.sl{flex:1;height:1.5px;background:var(--border);margin:0 5px;transition:.3s}
+.sl.dn{background:var(--acc)}
+.snames{display:flex;justify-content:space-between;font-size:11px;color:var(--mu);padding:0 2px;margin-bottom:24px}
+.pnl{display:none}.pnl.on{display:block;animation:up .28s ease}
+@keyframes up{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:translateY(0)}}
+
+/* SYNC TOGGLE */
+.syncbar{display:flex;align-items:center;gap:11px;padding:11px 13px;background:var(--w);border:1px solid var(--border);border-radius:10px;margin-bottom:14px;box-shadow:var(--sh)}
+.sw{position:relative;width:36px;height:21px;flex-shrink:0}
+.sw input{position:absolute;opacity:0;width:0;height:0}
+.sw-t{position:absolute;inset:0;border-radius:11px;background:var(--b2);cursor:pointer;transition:.2s}
+.sw input:checked+.sw-t{background:var(--acc)}
+.sw-t::after{content:'';position:absolute;width:15px;height:15px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.sw input:checked+.sw-t::after{left:18px}
+.sw-l{font-size:13px;color:var(--text)}
+.sw-l small{display:block;font-size:11px;color:var(--mu);margin-top:1px}
+
+/* EYES */
+.eyes{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+@media(max-width:480px){.eyes{grid-template-columns:1fr}}
+.eye{background:var(--w);border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:var(--sh)}
+.el{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--acc);margin-bottom:12px}
+.rxf{margin-bottom:9px}.rxf:last-child{margin-bottom:0}
+.rxf label{display:block;font-size:11px;color:var(--mu);margin-bottom:4px}
+.spin{display:flex;align-items:center;gap:5px}
+.sb{width:26px;height:26px;flex-shrink:0;border-radius:6px;background:var(--bg);border:1px solid var(--border);color:var(--text);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.14s}
+.sb:hover{background:var(--acc);border-color:var(--acc);color:#fff}
+.sv{flex:1;text-align:center;font-size:13px;font-weight:600;padding:4px 2px;background:var(--bg);border-radius:5px;border:1px solid var(--border);min-width:52px;font-variant-numeric:tabular-nums}
+
+/* PD */
+.pdc{background:var(--w);border:1px solid var(--border);border-radius:12px;padding:14px;box-shadow:var(--sh)}
+.pdh{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--acc);margin-bottom:10px}
+.pdm{display:flex;gap:5px;margin-bottom:12px}
+.pmb{padding:4px 12px;border-radius:6px;border:1px solid var(--border);background:none;color:var(--mu);font-size:12px;cursor:pointer;transition:.16s;font-family:inherit}
+.pmb.on{border-color:var(--acc);color:var(--acc);background:rgba(37,99,235,.05)}
+.pds{display:flex;gap:10px}
+.pds .rxf{flex:1}
+
+/* FRAMES */
+.fr-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:13px}
+.ft{padding:5px 13px;border-radius:100px;border:1px solid var(--border);background:none;color:var(--mu);font-size:12px;cursor:pointer;transition:.16s;font-family:inherit}
+.ft.on{background:var(--text);border-color:var(--text);color:#fff}
+.fr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+@media(max-width:440px){.fr-grid{grid-template-columns:repeat(2,1fr)}}
+.frc{border-radius:10px;border:1.5px solid var(--border);background:var(--w);cursor:pointer;transition:.18s;overflow:hidden;box-shadow:var(--sh)}
+.frc:hover{border-color:var(--b2);transform:translateY(-1px)}
+.frc.on{border-color:var(--acc);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.fr-svg{width:100%;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;background:#f8f8f8;color:var(--b2);padding:14px}
+.frc.on .fr-svg{color:var(--acc)}
+.fr-svg svg{width:80%}
+.fri{padding:7px 9px}
+.frn{font-size:12px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.frd{font-size:10px;color:var(--mu);margin-top:1px}
+.frck{width:14px;height:14px;border-radius:50%;background:var(--acc);display:none;align-items:center;justify-content:center;font-size:9px;color:#fff;font-weight:700;flex-shrink:0}
+.frc.on .frck{display:flex}
+.hint{margin-top:11px;padding:10px 12px;background:var(--w);border:1px solid var(--border);border-radius:9px;font-size:12px;color:var(--mu);line-height:1.5}
+
+/* LENSES */
+.ll{display:flex;flex-direction:column;gap:7px}
+.lo{display:flex;align-items:center;gap:11px;padding:12px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--w);cursor:pointer;transition:.18s;box-shadow:var(--sh)}
+.lo:hover{border-color:var(--b2)}
+.lo.on{border-color:var(--acc);background:rgba(37,99,235,.03)}
+.li{width:24px;text-align:center;flex-shrink:0;font-size:16px;color:var(--mu)}
+.lo.on .li{color:var(--acc)}
+.lt h4{font-size:13px;font-weight:600}
+.lt p{font-size:12px;color:var(--mu);margin-top:1px}
+.lck{margin-left:auto;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.18s}
+.lo.on .lck{background:var(--acc);border-color:var(--acc);color:#fff;font-size:10px;font-weight:700}
+
+/* ADD section */
+.add-sec{margin-top:16px}
+.add-sec-h{font-size:13px;font-weight:600;margin-bottom:3px}
+.add-sec-s{font-size:11px;color:var(--mu);margin-bottom:10px}
+
+/* COATINGS — single select */
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:14px}
+@media(max-width:380px){.cg{grid-template-columns:1fr}}
+.cc{padding:11px 13px;border-radius:10px;border:1.5px solid var(--border);background:var(--w);cursor:pointer;transition:.18s;box-shadow:var(--sh)}
+.cc:hover{border-color:var(--b2)}
+.cc.on{border-color:var(--acc);background:rgba(37,99,235,.03)}
+.ci{font-size:16px;margin-bottom:4px;color:var(--mu)}
+.cc.on .ci{color:var(--acc)}
+.cn2{font-size:12px;font-weight:600}
+.cd{font-size:11px;color:var(--mu);margin-top:2px}
+
+/* SUMMARY + CONTACT */
+.smry{background:var(--w);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:16px;box-shadow:var(--sh)}
+.smh{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mu);margin-bottom:10px}
+.sr{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--border);gap:10px}
+.sr:last-child{border:none;padding-bottom:0}
+.sk{font-size:11px;color:var(--mu);flex-shrink:0}
+.sv2{font-size:12px;font-weight:500;text-align:right}
+.fstack{display:flex;flex-direction:column;gap:10px}
+.ff label{display:block;font-size:12px;color:var(--mu);margin-bottom:5px;font-weight:500}
+.ff input,.ff textarea{width:100%;padding:10px 13px;border-radius:9px;border:1px solid var(--border);background:var(--w);color:var(--text);font-size:14px;outline:none;transition:.18s;font-family:inherit}
+.ff input:focus,.ff textarea:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+.ff textarea{resize:vertical;min-height:72px}
+
+/* BUTTONS */
+.nrow{display:flex;gap:8px;margin-top:22px}
+.btn{padding:11px 18px;border-radius:10px;border:none;font-size:14px;font-weight:600;cursor:pointer;transition:.18s;font-family:inherit}
+.btnp{background:var(--acc);color:#fff;flex:1}
+.btnp:hover{background:var(--ach)}
+.btnp:disabled{opacity:.5;cursor:not-allowed}
+.btns{background:var(--w);color:var(--text);border:1px solid var(--border)}
+.btns:hover{background:var(--bg);border-color:var(--b2)}
+
+/* SUCCESS */
+.succ{text-align:center;padding:24px 0}
+.sico{font-size:44px;margin-bottom:14px;color:var(--ok)}
+.sh2{font-size:20px;font-weight:700;margin-bottom:8px}
+.st{font-size:13px;color:var(--mu);line-height:1.7}
+.wa{display:inline-block;margin-top:18px;padding:10px 22px;background:#25d366;border-radius:9px;color:#fff;font-weight:600;text-decoration:none;font-size:13px}
+.wa:hover{background:#1ebe59}
+
+/* ASSORTMENT */
+.assort{max-width:860px;margin:0 auto;padding:0 20px 80px}
+.at{padding:38px 0 20px}
+.at h2{font-size:22px;font-weight:800;letter-spacing:-.3px;margin-bottom:4px}
+.at p{font-size:13px;color:var(--mu)}
+.pg{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:13px}
+.pc{border-radius:14px;border:1px solid var(--border);background:var(--w);overflow:hidden;transition:.22s;box-shadow:var(--sh)}
+.pc:hover{border-color:var(--b2);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.08)}
+.pc img{width:100%;aspect-ratio:4/3;object-fit:cover;background:#fff}
+.pcb{padding:13px}
+.pcn{font-size:14px;font-weight:700;margin-bottom:4px}
+.pcd{font-size:12px;color:var(--mu);line-height:1.5;margin-bottom:10px}
+.tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:10px}
+.tag{padding:3px 8px;border-radius:100px;background:var(--bg);border:1px solid var(--border);font-size:10px;color:var(--mu)}
+.pbt{width:100%;padding:9px;border-radius:8px;background:var(--acc);border:none;color:#fff;font-size:13px;font-weight:600;cursor:pointer;transition:.18s;font-family:inherit}
+.pbt:hover{background:var(--ach)}
+.empty{grid-column:1/-1;text-align:center;padding:48px;color:var(--mu);font-size:13px}
+
+/* MODAL */
+.ov{position:fixed;inset:0;z-index:200;background:rgba(26,25,23,.45);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:.22s}
+.ov.on{opacity:1;pointer-events:all}
+.modal{background:var(--w);border-radius:18px;border:1px solid var(--border);padding:24px;max-width:400px;width:100%;max-height:90vh;overflow-y:auto;position:relative;transform:translateY(12px);transition:.22s;box-shadow:0 20px 60px rgba(0,0,0,.1)}
+.ov.on .modal{transform:translateY(0)}
+.mx{position:absolute;top:11px;right:11px;width:26px;height:26px;border-radius:50%;background:var(--bg);border:none;color:var(--mu);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.mx:hover{color:var(--text)}
+.mh{font-size:17px;font-weight:700;margin-bottom:4px}
+.ms2{font-size:12px;color:var(--mu);margin-bottom:18px}
+
+/* FOOTER */
+footer{background:#1a1917;color:rgba(255,255,255,.5);padding:24px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;font-size:13px}
+.fl strong{color:#fff;display:block;margin-bottom:2px;font-size:14px}
+.fr2{display:flex;gap:14px}
+.fl2{color:rgba(255,255,255,.5);text-decoration:none;font-size:13px;transition:.18s}
+.fl2:hover{color:#fff}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo"><div class="logo-dot"></div>Майстер-оптик</div>
+  <div class="tabs">
+    <button class="tab on" onclick="showTab('c',this)">На замовлення</button>
+    <button class="tab" onclick="showTab('a',this)">Асортимент</button>
+  </div>
+  <a class="nav-ph" href="tel:+380991234567">+380 (99) 123-45-67</a>
+</nav>
+
+<main>
+
+<!-- ══ CONSTRUCTOR ══════════════════════════════ -->
+<section id="sc" class="sec on">
+  <div class="hero">
+    <h1>Окуляри точно по рецепту.<br><em>З виїздом до вас.</em></h1>
+    <p>Майстер приїде, допоможе підібрати оправу і зробить лінзи на місці — без черг і зайвих поїздок.</p>
+  </div>
+
+  <!-- ── METHOD SELECTOR ─────────────────────── -->
+  <div id="ms" class="wiz">
+    <h2 class="ph">Як оформити замовлення?</h2>
+    <p class="ps">Оберіть зручний спосіб</p>
+    <div class="mc-grid">
+      <div class="mc" onclick="setMethod('photo')">
+        <div class="mc-ico">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="13" rx="2" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/><path d="M9 6l1-2h4l1 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <strong>Завантажити рецепт</strong>
+        <span>Є бланк від лікаря — просто сфотографуйте і відправте</span>
+      </div>
+      <div class="mc" onclick="setMethod('manual')">
+        <div class="mc-ico">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <strong>Заповнити вручну</strong>
+        <span>Самостійно вкажіть діоптрії, оберіть оправу і лінзи</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PHOTO FLOW ───────────────────────────── -->
+  <div id="pf" class="wiz" style="display:none">
+    <button class="back-lnk" onclick="setMethod(null)">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Назад
+    </button>
+    <h2 class="ph">Завантажте рецепт</h2>
+    <p class="ps">Прикріпіть фото бланку і залиште контакти — майстер порахує все сам і зателефонує вам.</p>
+
+    <div class="upcta" onclick="document.getElementById('pf-file').click()">
+      <div class="upcta-ico">
+        <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 3v10M6 7l4-4 4 4" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 15v1a1 1 0 001 1h12a1 1 0 001-1v-1" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </div>
+      <div class="upcta-text">
+        <strong>Вибрати фото рецепту</strong>
+        <span>JPG, PNG — фото або скан бланку від лікаря</span>
+      </div>
+      <div class="upcta-arrow">Вибрати →</div>
+    </div>
+    <input type="file" id="pf-file" accept="image/*" style="display:none" onchange="onPfSelect()">
+    <div class="upname" id="pf-name-row">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M13 5L6.5 12 3 8.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span id="pf-name-txt"></span>
+      <button onclick="clearPf()">✕</button>
+    </div>
+
+    <div style="height:16px"></div>
+    <div class="fstack">
+      <div class="ff"><label>Ім'я *</label><input id="pf-cn" type="text" placeholder="Як вас звати?"></div>
+      <div class="ff"><label>Телефон *</label><input id="pf-cp" type="tel" placeholder="+380 (___) ___-__-__"></div>
+      <div class="ff"><label>Коментар</label><textarea id="pf-cc" placeholder="Побажання, зручний час..."></textarea></div>
+    </div>
+    <div class="nrow">
+      <button class="btn btnp" id="pf-sbtn" onclick="submitPhoto()">Відправити майстру →</button>
+    </div>
+  </div>
+
+  <!-- ── MANUAL FLOW (wizard) ─────────────────── -->
+  <div id="mf" class="wiz" style="display:none">
+    <button class="back-lnk" onclick="setMethod(null)">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Назад до вибору способу
+    </button>
+
+    <div class="sbar">
+      <div class="sd on" id="d1">1</div><div class="sl" id="l1"></div>
+      <div class="sd" id="d2">2</div><div class="sl" id="l2"></div>
+      <div class="sd" id="d3">3</div><div class="sl" id="l3"></div>
+      <div class="sd" id="d4">4</div>
+    </div>
+    <div class="snames"><span>Рецепт</span><span>Оправа</span><span>Лінзи</span><span>Контакти</span></div>
+
+    <!-- STEP 1: prescription -->
+    <div class="pnl on" id="p1">
+      <h2 class="ph">Рецепт на окуляри</h2>
+      <p class="ps">Введіть дані з рецепту. Не знаєте — залиште нулі, майстер перевірить зір при зустрічі.</p>
+
+      <div class="syncbar">
+        <label class="sw">
+          <input type="checkbox" id="sync" checked onchange="onSync()">
+          <div class="sw-t"></div>
+        </label>
+        <div class="sw-l">Однакові показники на обидва ока<small>Зніміть, щоб ввести рецепт для кожного ока окремо</small></div>
+      </div>
+
+      <div class="eyes">
+        <div class="eye">
+          <div class="el">ОД — Правий</div>
+          <div class="rxf"><label>Сфера (SPH)</label><div class="spin"><button class="sb" onclick="adj('od-sph',-1)">−</button><div class="sv" id="od-sph-v">0.00</div><button class="sb" onclick="adj('od-sph',1)">+</button></div></div>
+          <div class="rxf"><label>Циліндр (CYL)</label><div class="spin"><button class="sb" onclick="adj('od-cyl',-1)">−</button><div class="sv" id="od-cyl-v">0.00</div><button class="sb" onclick="adj('od-cyl',1)">+</button></div></div>
+          <div class="rxf"><label>Вісь (AX)</label><div class="spin"><button class="sb" onclick="adj('od-ax',-1)">−</button><div class="sv" id="od-ax-v">0°</div><button class="sb" onclick="adj('od-ax',1)">+</button></div></div>
+        </div>
+        <div class="eye" id="os-eye" style="opacity:.4;pointer-events:none">
+          <div class="el">ОС — Лівий</div>
+          <div class="rxf"><label>Сфера (SPH)</label><div class="spin"><button class="sb" onclick="adj('os-sph',-1)">−</button><div class="sv" id="os-sph-v">0.00</div><button class="sb" onclick="adj('os-sph',1)">+</button></div></div>
+          <div class="rxf"><label>Циліндр (CYL)</label><div class="spin"><button class="sb" onclick="adj('os-cyl',-1)">−</button><div class="sv" id="os-cyl-v">0.00</div><button class="sb" onclick="adj('os-cyl',1)">+</button></div></div>
+          <div class="rxf"><label>Вісь (AX)</label><div class="spin"><button class="sb" onclick="adj('os-ax',-1)">−</button><div class="sv" id="os-ax-v">0°</div><button class="sb" onclick="adj('os-ax',1)">+</button></div></div>
+        </div>
+      </div>
+
+      <div class="pdc">
+        <div class="pdh">Міжзіничний відстань (МЗВ / PD)</div>
+        <div class="pdm">
+          <button class="pmb on" onclick="setPD('s',this)">Загальне</button>
+          <button class="pmb" onclick="setPD('d',this)">Роздільне (ОД / ОС)</button>
+        </div>
+        <div id="pd-s">
+          <div class="rxf"><label>МЗВ, мм</label><div class="spin"><button class="sb" onclick="adj('pd',-1)">−</button><div class="sv" id="pd-v">64 мм</div><button class="sb" onclick="adj('pd',1)">+</button></div></div>
+        </div>
+        <div id="pd-d" style="display:none" class="pds">
+          <div class="rxf"><label>Правий, мм</label><div class="spin"><button class="sb" onclick="adj('pd-od',-1)">−</button><div class="sv" id="pd-od-v">32 мм</div><button class="sb" onclick="adj('pd-od',1)">+</button></div></div>
+          <div class="rxf"><label>Лівий, мм</label><div class="spin"><button class="sb" onclick="adj('pd-os',-1)">−</button><div class="sv" id="pd-os-v">32 мм</div><button class="sb" onclick="adj('pd-os',1)">+</button></div></div>
+        </div>
+      </div>
+
+      <div class="nrow"><button class="btn btnp" onclick="go(2)">Вибрати оправу →</button></div>
+    </div>
+
+    <!-- STEP 2: frame -->
+    <div class="pnl" id="p2">
+      <h2 class="ph">Оправа</h2>
+      <p class="ps">Виберіть з каталогу або пропустіть — майстер привезе кілька варіантів при зустрічі.</p>
+      <div class="fr-row" id="fr-fil">
+        <button class="ft on" onclick="filtFr('all',this)">Всі</button>
+        <button class="ft" onclick="filtFr('metal',this)">Метал</button>
+        <button class="ft" onclick="filtFr('plastic',this)">Пластик</button>
+      </div>
+      <div class="fr-grid" id="fr-grid"></div>
+      <div class="hint">Не знайшли потрібний колір або форму — напишіть в коментарі на останньому кроці.</div>
+      <div class="nrow"><button class="btn btns" onclick="go(1)">← Назад</button><button class="btn btnp" onclick="go(3)">Вибрати лінзи →</button></div>
+    </div>
+
+    <!-- STEP 3: lenses -->
+    <div class="pnl" id="p3">
+      <h2 class="ph">Лінзи</h2>
+      <p class="ps">Виберіть тип і покриття або пропустіть — майстер підбере при зустрічі.</p>
+      <div class="ll" id="ll"></div>
+      <div class="add-sec" id="add-section" style="display:none"></div>
+      <div style="margin-top:20px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:3px">Покриття лінз</div>
+        <div style="font-size:11px;color:var(--mu);margin-bottom:2px">Оберіть одне</div>
+        <div class="cg" id="cg"></div>
+      </div>
+      <div class="nrow"><button class="btn btns" onclick="go(2)">← Назад</button><button class="btn btnp" onclick="go(4)">Далі →</button></div>
+    </div>
+
+    <!-- STEP 4: contact -->
+    <div class="pnl" id="p4">
+      <h2 class="ph">Ваше замовлення</h2>
+      <p class="ps">Вартість обговорюється особисто — майстер зателефонує і домовиться про зустріч.</p>
+      <div class="smry" id="smry"></div>
+      <div class="fstack">
+        <div class="ff"><label>Ім'я *</label><input id="cn" type="text" placeholder="Як вас звати?"></div>
+        <div class="ff"><label>Телефон *</label><input id="cp" type="tel" placeholder="+380 (___) ___-__-__"></div>
+        <div class="ff"><label>Коментар</label><textarea id="cc" placeholder="Побажання, зручний час, район..."></textarea></div>
+      </div>
+      <div class="nrow">
+        <button class="btn btns" onclick="go(3)">← Назад</button>
+        <button class="btn btnp" id="sbtn" onclick="doSubmit()">Відправити майстру на розрахунок →</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ ASSORTMENT ═══════════════════════════════ -->
+<section id="sa" class="sec">
+  <div class="assort">
+    <div class="at">
+      <h2>Готові окуляри в наявності</h2>
+      <p>Готові окуляри з лінзами — майстер привезе обрану модель до вас</p>
+    </div>
+    <div class="pg" id="pg"></div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="fl"><strong>Майстер-оптик</strong>Виїзд до вас — оправи і лінзи на місці</div>
+  <div class="fr2">
+    <a class="fl2" href="tel:+380991234567">Зателефонувати</a>
+    <a class="fl2" href="https://t.me/optik_master_bot" target="_blank">Telegram</a>
+    <a class="fl2" href="https://wa.me/380991234567" target="_blank">WhatsApp</a>
+  </div>
+</footer>
+
+<div class="ov" id="ov" onclick="closeMod(event)">
+  <div class="modal">
+    <button class="mx" onclick="closeMod()">✕</button>
+    <div id="mb"></div>
+  </div>
+</div>
+
+<script>
+const CFG={
+  phone:'+380991234567',
+  wa:'380991234567',
+  tg:'optik_master_bot',
+  tok:'8363815653:AAHW0n1qxQOkYFWW51ZMLUmAQWcQTa9pq3E',
+  cid:'1717823108'
+};
+
+const SVG={
+  rect:`<svg viewBox="0 0 130 65" fill="none"><rect x="6" y="14" width="50" height="34" rx="9" stroke="currentColor" stroke-width="2.2"/><rect x="74" y="14" width="50" height="34" rx="9" stroke="currentColor" stroke-width="2.2"/><path d="M56 31h18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M6 22L1 13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M124 22l5-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>`,
+  round:`<svg viewBox="0 0 130 65" fill="none"><circle cx="32" cy="32" r="22" stroke="currentColor" stroke-width="2.2"/><circle cx="98" cy="32" r="22" stroke="currentColor" stroke-width="2.2"/><path d="M54 32h22" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M10 18L3 11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M120 18l7-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>`,
+  rimless:`<svg viewBox="0 0 130 65" fill="none"><circle cx="32" cy="32" r="22" stroke="currentColor" stroke-width="1.8" stroke-dasharray="5 3"/><circle cx="98" cy="32" r="22" stroke="currentColor" stroke-width="1.8" stroke-dasharray="5 3"/><path d="M54 32h22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M10 18L3 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M120 18l7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
+};
+
+const FRAMES=[
+  {id:1,name:'Прямокутна',  desc:'Метал · чорна/золото',      img:null,cat:'metal',  sh:'rect'},
+  {id:2,name:'Кругла',      desc:'Метал · матовий чорний',    img:null,cat:'metal',  sh:'round'},
+  {id:3,name:'Авіатор',     desc:'Метал · срібло',            img:null,cat:'metal',  sh:'rect'},
+  {id:4,name:'Вайфарер',    desc:'Пластик · тортуаз',         img:null,cat:'plastic',sh:'rect'},
+  {id:5,name:'Котяче око',  desc:'Пластик · чорний',          img:null,cat:'plastic',sh:'round'},
+  {id:6,name:'Без оправи',  desc:'Нейлонові лінзи',           img:null,cat:'rimless',sh:'rimless'},
+];
+
+const LENSES=[
+  {id:'single',name:'Однофокальні',  desc:'Для постійного носіння при міопії або гіперметропії'},
+  {id:'prog',  name:'Прогресивні',   desc:'Верхня зона (даль) і нижня зона (близь) — в одній лінзі'},
+  {id:'bif',   name:'Біфокальні',    desc:'Дві чіткі зони: верхня (даль) і нижня (читання)'},
+  {id:'comp',  name:'Комп\'ютерні',  desc:'Знижують навантаження при тривалій роботі за екраном'},
+];
+
+const COATS=[
+  {id:'ar',   name:'Антиблікове',            desc:'Прибирає відблиски екранів і фар'},
+  {id:'ph',   name:'Фотохром',               desc:'Темніють на сонці, світлішають у приміщенні'},
+  {id:'blue', name:'Блю блок',               desc:'Фільтр синього світла від екранів'},
+  {id:'tint', name:'Тонування',              desc:'Кольорове або димчасте покриття'},
+  {id:'pol',  name:'Поляризаційна вставка',  desc:'Прибирає відблиски від води, дороги, скла'},
+];
+
+const PRODS=[
+  {id:1,name:'Класика Золото', desc:'Готові окуляри в прямокутній металевій оправі з золотими акцентами. Діловий стиль.', img:'тест 1.jpg', tags:['Метал','Прямокутні','+2.00'],cat:'ready'},
+  {id:2,name:'Кругла Noir',   desc:'Готові окуляри в круглій матовій металевій оправі. Підходять для корекції зору та іміджу.', img:'Тест 2.png', tags:['Метал','Круглі','Унісекс'],cat:'ready'},
+];
+
+// ── STATE ────────────────────────────────────────
+const rx={'od-sph':0,'od-cyl':0,'od-ax':0,'os-sph':0,'os-cyl':0,'os-ax':0,'pd':64,'pd-od':32,'pd-os':32,'od-add':0,'os-add':0};
+function fmtD(v){const a=Math.abs(v).toFixed(2);return v>0?'+'+a:v<0?'−'+a:a}
+function fmtADD(v){return v===0?'0.00':'+'+v.toFixed(2)}
+const RC={
+  'od-sph':{mn:-20,mx:20,s:.25,f:fmtD},'os-sph':{mn:-20,mx:20,s:.25,f:fmtD},
+  'od-cyl':{mn:-6,mx:6,s:.25,f:fmtD},'os-cyl':{mn:-6,mx:6,s:.25,f:fmtD},
+  'od-ax':{mn:0,mx:180,s:1,f:v=>v+'°'},'os-ax':{mn:0,mx:180,s:1,f:v=>v+'°'},
+  'pd':{mn:52,mx:76,s:1,f:v=>v+' мм'},'pd-od':{mn:26,mx:38,s:.5,f:v=>v+' мм'},'pd-os':{mn:26,mx:38,s:.5,f:v=>v+' мм'},
+  'od-add':{mn:0,mx:3.5,s:.25,f:fmtADD},'os-add':{mn:0,mx:3.5,s:.25,f:fmtADD},
+};
+let synced=true,pdM='s',selFr=null,selL=null,selC=null,selProd=null,frFil='all';
+
+// ── METHOD SELECTOR ──────────────────────────────
+function setMethod(m){
+  document.getElementById('ms').style.display='none';
+  document.getElementById('pf').style.display='none';
+  document.getElementById('mf').style.display='none';
+  if(!m){document.getElementById('ms').style.display='block';return}
+  if(m==='photo') document.getElementById('pf').style.display='block';
+  if(m==='manual') document.getElementById('mf').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── PHOTO FLOW ───────────────────────────────────
+function onPfSelect(){
+  const f=document.getElementById('pf-file').files?.[0];
+  const el=document.getElementById('pf-name-row');
+  if(f){document.getElementById('pf-name-txt').textContent=f.name;el.style.display='flex'}
+  else el.style.display='none';
+}
+function clearPf(){document.getElementById('pf-file').value='';document.getElementById('pf-name-row').style.display='none'}
+
+async function submitPhoto(){
+  const name=document.getElementById('pf-cn').value.trim();
+  const phone=document.getElementById('pf-cp').value.trim();
+  const comment=document.getElementById('pf-cc').value.trim();
+  if(!name||!phone){alert('Будь ласка, вкажіть ім\'я і телефон');return}
+  const btn=document.getElementById('pf-sbtn');btn.textContent='Надсилаємо…';btn.disabled=true;
+  const msg=`📋 <b>Замовлення (фото рецепту)</b>\n\n👤 ${name}\n📞 ${phone}${comment?'\n\n'+comment:''}`;
+  await tgMsg(msg);
+  const pic=document.getElementById('pf-file')?.files?.[0];
+  if(pic) await tgPic(pic,`Рецепт від ${name} (${phone})`);
+  document.getElementById('pf').innerHTML=successHTML(name,phone);
+}
+
+// ── SPINNERS ─────────────────────────────────────
+function adj(f,d){
+  const c=RC[f];let v=rx[f]+d*c.s;
+  v=Math.round(v/c.s)*c.s;v=Math.max(c.mn,Math.min(c.mx,v));rx[f]=v;
+  document.getElementById(f+'-v').textContent=c.f(v);
+  if(synced&&f.startsWith('od-')){const of2='os-'+f.slice(3);if(of2 in rx){rx[of2]=v;const el=document.getElementById(of2+'-v');if(el)el.textContent=RC[of2].f(v)}}
+}
+function onSync(){
+  synced=document.getElementById('sync').checked;
+  const e=document.getElementById('os-eye');
+  e.style.opacity=synced?'.4':'1';e.style.pointerEvents=synced?'none':'auto';
+  if(synced)['sph','cyl','ax'].forEach(f=>{const v=rx['od-'+f];rx['os-'+f]=v;const el=document.getElementById('os-'+f+'-v');if(el)el.textContent=RC['os-'+f].f(v)});
+}
+function setPD(m,b){
+  pdM=m;document.querySelectorAll('.pmb').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+  document.getElementById('pd-s').style.display=m==='s'?'block':'none';
+  document.getElementById('pd-d').style.display=m==='d'?'flex':'none';
+}
+
+// ── STEPS ────────────────────────────────────────
+function go(n){
+  document.querySelectorAll('.pnl').forEach(p=>p.classList.remove('on'));
+  document.getElementById('p'+n).classList.add('on');
+  for(let i=1;i<=4;i++){
+    const d=document.getElementById('d'+i);d.className='sd';
+    if(i<n){d.classList.add('dn');d.textContent='✓'}else if(i===n){d.classList.add('on');d.textContent=i}else d.textContent=i;
+    if(i<4)document.getElementById('l'+i).className='sl'+(i<n?' dn':'');
+  }
+  if(n===4)buildSmry();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── FRAMES ───────────────────────────────────────
+function renderFr(){
+  const items=frFil==='all'?FRAMES:FRAMES.filter(f=>f.cat===frFil);
+  document.getElementById('fr-grid').innerHTML=items.map(f=>`
+    <div class="frc${selFr===f.id?' on':''}" onclick="pickFr(${f.id})">
+      <div class="fr-svg">${SVG[f.sh]}</div>
+      <div class="fri"><div class="frn">${f.name}<div class="frck">✓</div></div><div class="frd">${f.desc}</div></div>
+    </div>`).join('');
+}
+function pickFr(id){selFr=selFr===id?null:id;renderFr()}
+function filtFr(c,b){frFil=c;document.querySelectorAll('#fr-fil .ft').forEach(x=>x.classList.remove('on'));b.classList.add('on');renderFr()}
+
+// ── LENSES ───────────────────────────────────────
+function renderL(){
+  document.getElementById('ll').innerHTML=LENSES.map(l=>`
+    <div class="lo${selL===l.id?' on':''}" onclick="pickL('${l.id}')">
+      <div class="li">${selL===l.id?'●':'○'}</div>
+      <div class="lt"><h4>${l.name}</h4><p>${l.desc}</p></div>
+      <div class="lck">${selL===l.id?'✓':''}</div>
+    </div>`).join('');
+
+  const addEl=document.getElementById('add-section');
+  if(selL==='prog'||selL==='bif'){
+    const isBif=selL==='bif';
+    addEl.style.display='block';
+    addEl.innerHTML=`<div class="add-sec-h">${isBif?'Параметри біфокальних лінз':'Зони прогресивних лінз'}</div>
+      <div class="add-sec-s">ADD — добавка до сфери для нижньої зони (читання / близь)</div>
+      <div class="eyes">
+        <div class="eye">
+          <div class="el">ОД — Правий</div>
+          <div class="rxf"><label>${isBif?'Зона читання':'Нижня зона'} (ADD)</label>
+          <div class="spin"><button class="sb" onclick="adj('od-add',-1)">−</button><div class="sv" id="od-add-v">${fmtADD(rx['od-add'])}</div><button class="sb" onclick="adj('od-add',1)">+</button></div></div>
+        </div>
+        <div class="eye">
+          <div class="el">ОС — Лівий</div>
+          <div class="rxf"><label>${isBif?'Зона читання':'Нижня зона'} (ADD)</label>
+          <div class="spin"><button class="sb" onclick="adj('os-add',-1)">−</button><div class="sv" id="os-add-v">${fmtADD(rx['os-add'])}</div><button class="sb" onclick="adj('os-add',1)">+</button></div></div>
+        </div>
+      </div>`;
+  } else {
+    addEl.style.display='none';
+  }
+
+  // coatings — single select
+  document.getElementById('cg').innerHTML=COATS.map(c=>`
+    <div class="cc${selC===c.id?' on':''}" onclick="pickC('${c.id}')">
+      <div class="ci">${selC===c.id?'●':'○'}</div>
+      <div class="cn2">${c.name}</div><div class="cd">${c.desc}</div>
+    </div>`).join('');
+}
+function pickL(id){selL=selL===id?null:id;renderL()}
+function pickC(id){selC=selC===id?null:id;renderL()}
+
+// ── PRODUCTS ─────────────────────────────────────
+function renderPr(){
+  document.getElementById('pg').innerHTML=PRODS.map(p=>`
+    <div class="pc">
+      <img src="${p.img}" alt="${p.name}">
+      <div class="pcb">
+        <div class="pcn">${p.name}</div>
+        <div class="pcd">${p.desc}</div>
+        <div class="tags">${p.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+        <button class="pbt" onclick="orderProd(${p.id})">Хочу цю модель</button>
+      </div>
+    </div>`).join('');
+}
+function orderProd(id){
+  selProd=PRODS.find(p=>p.id===id);
+  document.getElementById('mb').innerHTML=`
+    <div class="mh">Замовити модель</div>
+    <div class="ms2">«${selProd.name}» — майстер привезе її до вас</div>
+    <div class="fstack" style="margin-bottom:14px">
+      <div class="ff"><label>Ім'я *</label><input id="mn" type="text" placeholder="Як вас звати?"></div>
+      <div class="ff"><label>Телефон *</label><input id="mp" type="tel" placeholder="+380 (___) ___-__-__"></div>
+      <div class="ff"><label>Рецепт / коментар</label><textarea id="mc" placeholder="Діоптрії, побажання, зручний час..."></textarea></div>
+    </div>
+    <button class="btn btnp" style="width:100%" onclick="submitProd()">Відправити заявку</button>`;
+  openMod();
+}
+
+// ── SUMMARY ──────────────────────────────────────
+function buildSmry(){
+  const fr=selFr?FRAMES.find(f=>f.id===selFr):null;
+  const ln=selL?LENSES.find(l=>l.id===selL):null;
+  const ct=selC?COATS.find(c=>c.id===selC):null;
+  const pd=pdM==='s'?rx['pd']+' мм':`ОД ${rx['pd-od']} / ОС ${rx['pd-os']} мм`;
+  document.getElementById('smry').innerHTML=`
+    <div class="smh">Зведення</div>
+    <div class="sr"><span class="sk">Правий (ОД)</span><span class="sv2">SPH ${fmtD(rx['od-sph'])} / CYL ${fmtD(rx['od-cyl'])} / AX ${rx['od-ax']}°</span></div>
+    <div class="sr"><span class="sk">Лівий (ОС)</span><span class="sv2">${synced?'= Правий':`SPH ${fmtD(rx['os-sph'])} / CYL ${fmtD(rx['os-cyl'])} / AX ${rx['os-ax']}°`}</span></div>
+    <div class="sr"><span class="sk">МЗВ</span><span class="sv2">${pd}</span></div>
+    ${(selL==='prog'||selL==='bif')?`<div class="sr"><span class="sk">ADD ОД / ОС</span><span class="sv2">${fmtADD(rx['od-add'])} / ${fmtADD(rx['os-add'])}</span></div>`:''}
+    <div class="sr"><span class="sk">Оправа</span><span class="sv2">${fr?fr.name+' · '+fr.desc:'Обговоримо при зустрічі'}</span></div>
+    <div class="sr"><span class="sk">Лінзи</span><span class="sv2">${ln?ln.name:'Обговоримо при зустрічі'}</span></div>
+    <div class="sr"><span class="sk">Покриття</span><span class="sv2">${ct?ct.name:'Обговоримо при зустрічі'}</span></div>`;
+}
+
+// ── TELEGRAM ─────────────────────────────────────
+async function tgMsg(text){
+  if(!CFG.tok||!CFG.cid)return false;
+  try{const r=await fetch(`https://api.telegram.org/bot${CFG.tok}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:CFG.cid,text,parse_mode:'HTML'})});return r.ok}catch{return false}
+}
+async function tgPic(file,cap){
+  if(!CFG.tok||!CFG.cid)return;
+  try{const fd2=new FormData();fd2.append('chat_id',CFG.cid);fd2.append('photo',file);fd2.append('caption',cap);await fetch(`https://api.telegram.org/bot${CFG.tok}/sendPhoto`,{method:'POST',body:fd2})}catch{}
+}
+
+// ── SUBMIT MANUAL ─────────────────────────────────
+async function doSubmit(){
+  const name=document.getElementById('cn').value.trim();
+  const phone=document.getElementById('cp').value.trim();
+  const comment=document.getElementById('cc').value.trim();
+  if(!name||!phone){alert('Будь ласка, вкажіть ім\'я і телефон');return}
+  const fr=selFr?FRAMES.find(f=>f.id===selFr):null;
+  const ln=selL?LENSES.find(l=>l.id===selL):null;
+  const ct=selC?COATS.find(c=>c.id===selC):null;
+  const pd=pdM==='s'?rx['pd']+' мм':`ОД ${rx['pd-od']} / ОС ${rx['pd-os']} мм`;
+  const addStr=(selL==='prog'||selL==='bif')?`\n  ADD ОД / ОС: ${fmtADD(rx['od-add'])} / ${fmtADD(rx['os-add'])}`:'';
+  const msg=`📋 <b>Нове замовлення на окуляри</b>\n\n👤 ${name}\n📞 ${phone}\n\n<b>Рецепт:</b>\n  ОД: SPH ${fmtD(rx['od-sph'])} / CYL ${fmtD(rx['od-cyl'])} / AX ${rx['od-ax']}°\n  ОС: ${synced?'= ОД':`SPH ${fmtD(rx['os-sph'])} / CYL ${fmtD(rx['os-cyl'])} / AX ${rx['os-ax']}°`}\n  МЗВ: ${pd}${addStr}\n\nОправа: ${fr?fr.name+' ('+fr.desc+')':'не обрана'}\nЛінзи: ${ln?ln.name:'не обрані'}\nПокриття: ${ct?ct.name:'не обрано'}${comment?'\n\n'+comment:''}`;
+  const btn=document.getElementById('sbtn');btn.textContent='Надсилаємо…';btn.disabled=true;
+  await tgMsg(msg);
+  document.getElementById('p4').innerHTML=successHTML(name,phone);
+  document.getElementById('p4').classList.add('on');
+}
+
+// ── SUBMIT PRODUCT ────────────────────────────────
+async function submitProd(){
+  const name=document.getElementById('mn').value.trim();
+  const phone=document.getElementById('mp').value.trim();
+  const comment=document.getElementById('mc').value.trim();
+  if(!name||!phone){alert('Вкажіть ім\'я і телефон');return}
+  await tgMsg(`📋 <b>Замовлення з асортименту</b>\n\n👤 ${name}\n📞 ${phone}\n🔲 ${selProd.name}${comment?'\n\n'+comment:''}`);
+  document.getElementById('mb').innerHTML=`<div class="succ"><div class="sico">✓</div><div class="sh2">Заявку прийнято</div><div class="st">Майстер зателефонує вам<br>за номером <strong>${phone}</strong></div><a class="wa" href="https://wa.me/${CFG.wa}" target="_blank">Написати в WhatsApp</a></div>`;
+}
+
+// ── SUCCESS ───────────────────────────────────────
+function successHTML(name,phone){
+  return`<div class="succ"><div class="sico">✓</div><div class="sh2">Замовлення відправлено</div><div class="st">${name}, майстер незабаром зателефонує вам<br>за номером <strong>${phone}</strong><br><br>Домовтеся про зручний час — майстер приїде сам.</div><a class="wa" href="https://wa.me/${CFG.wa}" target="_blank">Написати в WhatsApp</a></div>`;
+}
+
+// ── MODAL ─────────────────────────────────────────
+function openMod(){document.getElementById('ov').classList.add('on')}
+function closeMod(e){if(e&&e.target!==document.getElementById('ov'))return;document.getElementById('ov').classList.remove('on')}
+
+// ── TABS ──────────────────────────────────────────
+function showTab(t,b){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.getElementById('s'+t).classList.add('on');
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+}
+
+// ── INIT ──────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>{renderFr();renderL();renderPr()});
+</script>
+</body>
+</html>
