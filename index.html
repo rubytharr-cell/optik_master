@@ -111,9 +111,10 @@ main{padding-top:56px;min-height:100vh}
 .frc{border-radius:10px;border:1.5px solid var(--border);background:var(--w);cursor:pointer;transition:.18s;overflow:hidden;box-shadow:var(--sh)}
 .frc:hover{border-color:var(--b2);transform:translateY(-1px)}
 .frc.on{border-color:var(--acc);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
-.fr-svg{width:100%;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;background:#f8f8f8;color:var(--b2);padding:14px}
+.fr-svg{width:100%;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;background:#f8f8f8;color:var(--b2);overflow:hidden}
 .frc.on .fr-svg{color:var(--acc)}
 .fr-svg svg{width:80%}
+.fr-img{width:100%;height:100%;object-fit:cover}
 .fri{padding:7px 9px}
 .frn{font-size:12px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
 .frd{font-size:10px;color:var(--mu);margin-top:1px}
@@ -158,8 +159,8 @@ main{padding-top:56px;min-height:100vh}
 .sv2{font-size:12px;font-weight:500;text-align:right}
 .fstack{display:flex;flex-direction:column;gap:10px}
 .ff label{display:block;font-size:12px;color:var(--mu);margin-bottom:5px;font-weight:500}
-.ff input,.ff textarea{width:100%;padding:10px 13px;border-radius:9px;border:1px solid var(--border);background:var(--w);color:var(--text);font-size:14px;outline:none;transition:.18s;font-family:inherit}
-.ff input:focus,.ff textarea:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(37,99,235,.08)}
+.ff input,.ff textarea,.ff select{width:100%;padding:10px 13px;border-radius:9px;border:1px solid var(--border);background:var(--w);color:var(--text);font-size:14px;outline:none;transition:.18s;font-family:inherit}
+.ff input:focus,.ff textarea:focus,.ff select:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(37,99,235,.08)}
 .ff textarea{resize:vertical;min-height:72px}
 
 /* BUTTONS */
@@ -188,6 +189,8 @@ main{padding-top:56px;min-height:100vh}
 .pc{border-radius:14px;border:1px solid var(--border);background:var(--w);overflow:hidden;transition:.22s;box-shadow:var(--sh)}
 .pc:hover{border-color:var(--b2);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.08)}
 .pc img{width:100%;aspect-ratio:4/3;object-fit:cover;background:#fff}
+.pc-ph{width:100%;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;background:#f0efec;color:var(--b2)}
+.pc-ph svg{width:46%}
 .pcb{padding:13px}
 .pcn{font-size:14px;font-weight:700;margin-bottom:4px}
 .pcd{font-size:12px;color:var(--mu);line-height:1.5;margin-bottom:10px}
@@ -365,6 +368,7 @@ footer{background:#1a1917;color:rgba(255,255,255,.5);padding:24px 20px;display:f
         <button class="ft" onclick="filtFr('plastic',this)">Пластик</button>
       </div>
       <div class="fr-grid" id="fr-grid"></div>
+      <div id="fr-color" style="display:none"></div>
       <div class="hint">Не знайшли потрібний колір або форму — напишіть в коментарі на останньому кроці.</div>
       <div class="nrow"><button class="btn btns" onclick="go(1)">← Назад</button><button class="btn btnp" onclick="go(3)">Вибрати лінзи →</button></div>
     </div>
@@ -375,6 +379,7 @@ footer{background:#1a1917;color:rgba(255,255,255,.5);padding:24px 20px;display:f
       <p class="ps">Виберіть тип і покриття або пропустіть — майстер підбере при зустрічі.</p>
       <div class="ll" id="ll"></div>
       <div class="add-sec" id="add-section" style="display:none"></div>
+      <div id="mat-sec" style="margin-top:20px"></div>
       <div style="margin-top:20px">
         <div style="font-size:13px;font-weight:600;margin-bottom:3px">Покриття лінз</div>
         <div style="font-size:11px;color:var(--mu);margin-bottom:2px">Оберіть одне</div>
@@ -431,14 +436,31 @@ footer{background:#1a1917;color:rgba(255,255,255,.5);padding:24px 20px;display:f
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const CFG={
   phone:'+380991234567',
   wa:'380991234567',
   tg:'optik_master_bot',
-  tok:'8363815653:AAHW0n1qxQOkYFWW51ZMLUmAQWcQTa9pq3E',
-  cid:'1717823108'
+  supaUrl:'https://blqvrxzuovmunmybonzb.supabase.co',
+  supaKey:'sb_publishable_FpEwYLAa2FPbLAOABHw2vA_IogMdW7h'
 };
+const sb=window.supabase.createClient(CFG.supaUrl,CFG.supaKey);
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+async function uploadPhoto(file,folder){
+  try{
+    const ext=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
+    const path=`${folder}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;
+    const {error}=await sb.storage.from('photos').upload(path,file,{cacheControl:'3600',upsert:false});
+    if(error){console.error(error);return null}
+    return sb.storage.from('photos').getPublicUrl(path).data.publicUrl;
+  }catch(e){console.error(e);return null}
+}
+async function sendOrder(row){
+  const {error}=await sb.from('orders').insert(row);
+  if(error)console.error(error);
+  return !error;
+}
 
 const SVG={
   rect:`<svg viewBox="0 0 130 65" fill="none"><rect x="6" y="14" width="50" height="34" rx="9" stroke="currentColor" stroke-width="2.2"/><rect x="74" y="14" width="50" height="34" rx="9" stroke="currentColor" stroke-width="2.2"/><path d="M56 31h18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M6 22L1 13" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M124 22l5-9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>`,
@@ -446,33 +468,39 @@ const SVG={
   rimless:`<svg viewBox="0 0 130 65" fill="none"><circle cx="32" cy="32" r="22" stroke="currentColor" stroke-width="1.8" stroke-dasharray="5 3"/><circle cx="98" cy="32" r="22" stroke="currentColor" stroke-width="1.8" stroke-dasharray="5 3"/><path d="M54 32h22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M10 18L3 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M120 18l7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>`,
 };
 
-const FRAMES=[
-  {id:1,name:'Прямокутна',  desc:'Метал · чорна/золото',      img:null,cat:'metal',  sh:'rect'},
-  {id:2,name:'Кругла',      desc:'Метал · матовий чорний',    img:null,cat:'metal',  sh:'round'},
-  {id:3,name:'Авіатор',     desc:'Метал · срібло',            img:null,cat:'metal',  sh:'rect'},
-  {id:4,name:'Вайфарер',    desc:'Пластик · тортуаз',         img:null,cat:'plastic',sh:'rect'},
-  {id:5,name:'Котяче око',  desc:'Пластик · чорний',          img:null,cat:'plastic',sh:'round'},
-  {id:6,name:'Без оправи',  desc:'Нейлонові лінзи',           img:null,cat:'rimless',sh:'rimless'},
-];
+let FRAMES=[];
+let PRODS=[];
+async function loadCatalog(){
+  try{
+    const [fr,pr]=await Promise.all([
+      sb.from('frames').select('*').eq('active',true).order('sort').order('id'),
+      sb.from('products').select('*').eq('active',true).order('sort').order('id'),
+    ]);
+    FRAMES=(fr.data||[]).map(f=>({id:f.id,name:f.name,cat:f.category||'metal',sh:f.shape||'rect',colors:f.colors||[],img:f.photo_url||null}));
+    PRODS=(pr.data||[]).map(p=>({id:p.id,name:p.name,desc:p.description||'',img:p.photo_url||null,tags:p.tags||[],colors:p.colors||[],diopters:p.diopters||[]}));
+  }catch(e){console.error(e)}
+  renderFr();renderPr();
+}
 
 const LENSES=[
-  {id:'single',name:'Однофокальні',  desc:'Для постійного носіння при міопії або гіперметропії'},
-  {id:'prog',  name:'Прогресивні',   desc:'Верхня зона (даль) і нижня зона (близь) — в одній лінзі'},
-  {id:'bif',   name:'Біфокальні',    desc:'Дві чіткі зони: верхня (даль) і нижня (читання)'},
-  {id:'comp',  name:'Комп\'ютерні',  desc:'Знижують навантаження при тривалій роботі за екраном'},
+  {id:'single',name:'Однофокальні'},
+  {id:'bif',   name:'Біфокальні'},
+  {id:'prog',  name:'Прогресивні'},
+  {id:'miogen',name:'Miogen'},
+  {id:'ph',    name:'Фотохром'},
+  {id:'tint',  name:'Тонування'},
+  {id:'pol',   name:'Поляризаційна'},
+  {id:'drive', name:'Drive'},
+];
+
+const MATS=[
+  {id:'std', name:'Звичайне скло'},
+  {id:'thin',name:'Потоншене скло'},
 ];
 
 const COATS=[
-  {id:'ar',   name:'Антиблікове',            desc:'Прибирає відблиски екранів і фар'},
-  {id:'ph',   name:'Фотохром',               desc:'Темніють на сонці, світлішають у приміщенні'},
-  {id:'blue', name:'Блю блок',               desc:'Фільтр синього світла від екранів'},
-  {id:'tint', name:'Тонування',              desc:'Кольорове або димчасте покриття'},
-  {id:'pol',  name:'Поляризаційна вставка',  desc:'Прибирає відблиски від води, дороги, скла'},
-];
-
-const PRODS=[
-  {id:1,name:'Класика Золото', desc:'Готові окуляри в прямокутній металевій оправі з золотими акцентами. Діловий стиль.', img:'тест 1.jpg', tags:['Метал','Прямокутні','+2.00'],cat:'ready'},
-  {id:2,name:'Кругла Noir',   desc:'Готові окуляри в круглій матовій металевій оправі. Підходять для корекції зору та іміджу.', img:'Тест 2.png', tags:['Метал','Круглі','Унісекс'],cat:'ready'},
+  {id:'ar',   name:'Антиблікове'},
+  {id:'blue', name:'Блю блок'},
 ];
 
 // ── STATE ────────────────────────────────────────
@@ -486,7 +514,8 @@ const RC={
   'pd':{mn:52,mx:76,s:1,f:v=>v+' мм'},'pd-od':{mn:26,mx:38,s:.5,f:v=>v+' мм'},'pd-os':{mn:26,mx:38,s:.5,f:v=>v+' мм'},
   'od-add':{mn:0,mx:3.5,s:.25,f:fmtADD},'os-add':{mn:0,mx:3.5,s:.25,f:fmtADD},
 };
-let synced=true,pdM='s',selFr=null,selL=null,selC=null,selProd=null,frFil='all';
+let synced=true,pdM='s',selFr=null,selFrColor=null,selL=null,selMat=null,selC=null,selProd=null,frFil='all';
+let mDiop=null,mColor=null;
 
 // ── METHOD SELECTOR ──────────────────────────────
 function setMethod(m){
@@ -513,11 +542,13 @@ async function submitPhoto(){
   const phone=document.getElementById('pf-cp').value.trim();
   const comment=document.getElementById('pf-cc').value.trim();
   if(!name||!phone){alert('Будь ласка, вкажіть ім\'я і телефон');return}
-  const btn=document.getElementById('pf-sbtn');btn.textContent='Надсилаємо…';btn.disabled=true;
-  const msg=`📋 <b>Замовлення (фото рецепту)</b>\n\n👤 ${name}\n📞 ${phone}${comment?'\n\n'+comment:''}`;
-  await tgMsg(msg);
+  const btn=document.getElementById('pf-sbtn');const btnTxt=btn.textContent;btn.textContent='Надсилаємо…';btn.disabled=true;
+  let photo_url=null;
   const pic=document.getElementById('pf-file')?.files?.[0];
-  if(pic) await tgPic(pic,`Рецепт від ${name} (${phone})`);
+  if(pic){photo_url=await uploadPhoto(pic,'orders')}
+  const text=`📋 <b>Замовлення (фото рецепту)</b>\n\n👤 ${esc(name)}\n📞 ${esc(phone)}${comment?'\n\n'+esc(comment):''}`;
+  const ok=await sendOrder({kind:'photo',name,phone,comment,photo_url,payload:{text}});
+  if(!ok){alert('Не вдалося надіслати. Перевірте інтернет і спробуйте ще раз.');btn.textContent=btnTxt;btn.disabled=false;return}
   document.getElementById('pf').innerHTML=successHTML(name,phone);
 }
 
@@ -556,13 +587,25 @@ function go(n){
 // ── FRAMES ───────────────────────────────────────
 function renderFr(){
   const items=frFil==='all'?FRAMES:FRAMES.filter(f=>f.cat===frFil);
-  document.getElementById('fr-grid').innerHTML=items.map(f=>`
+  const grid=document.getElementById('fr-grid');
+  if(!items.length){grid.innerHTML=`<div class="hint" style="grid-column:1/-1">Оправу оберемо при зустрічі — майстер привезе кілька варіантів. Натисніть «Вибрати лінзи».</div>`;}
+  else grid.innerHTML=items.map(f=>`
     <div class="frc${selFr===f.id?' on':''}" onclick="pickFr(${f.id})">
-      <div class="fr-svg">${SVG[f.sh]}</div>
-      <div class="fri"><div class="frn">${f.name}<div class="frck">✓</div></div><div class="frd">${f.desc}</div></div>
+      <div class="fr-svg">${f.img?`<img src="${esc(f.img)}" alt="${esc(f.name)}" class="fr-img">`:(SVG[f.sh]||SVG.rect)}</div>
+      <div class="fri"><div class="frn">${esc(f.name)}<div class="frck">✓</div></div></div>
     </div>`).join('');
+  const f=FRAMES.find(x=>x.id===selFr);
+  const cEl=document.getElementById('fr-color');
+  if(f&&f.colors&&f.colors.length){
+    cEl.style.display='block';
+    cEl.innerHTML=`<div style="font-size:12px;font-weight:600;margin:16px 0 7px">Колір оправи «${esc(f.name)}»</div>
+      <div class="fr-row">${f.colors.map((c,i)=>`<button class="ft${selFrColor===c?' on':''}" onclick="pickFrColor(${i})">${esc(c)}</button>`).join('')}</div>`;
+  } else {
+    cEl.style.display='none';
+  }
 }
-function pickFr(id){selFr=selFr===id?null:id;renderFr()}
+function pickFr(id){selFr=selFr===id?null:id;selFrColor=null;renderFr()}
+function pickFrColor(i){const f=FRAMES.find(x=>x.id===selFr);if(!f)return;const c=f.colors[i];selFrColor=selFrColor===c?null:c;renderFr()}
 function filtFr(c,b){frFil=c;document.querySelectorAll('#fr-fil .ft').forEach(x=>x.classList.remove('on'));b.classList.add('on');renderFr()}
 
 // ── LENSES ───────────────────────────────────────
@@ -570,7 +613,7 @@ function renderL(){
   document.getElementById('ll').innerHTML=LENSES.map(l=>`
     <div class="lo${selL===l.id?' on':''}" onclick="pickL('${l.id}')">
       <div class="li">${selL===l.id?'●':'○'}</div>
-      <div class="lt"><h4>${l.name}</h4><p>${l.desc}</p></div>
+      <div class="lt"><h4>${l.name}</h4></div>
       <div class="lck">${selL===l.id?'✓':''}</div>
     </div>`).join('');
 
@@ -596,47 +639,71 @@ function renderL(){
     addEl.style.display='none';
   }
 
+  // material — single select
+  document.getElementById('mat-sec').innerHTML=`
+    <div style="font-size:13px;font-weight:600;margin-bottom:3px">Матеріал лінзи</div>
+    <div style="font-size:11px;color:var(--mu);margin-bottom:2px">Оберіть один</div>
+    <div class="cg">${MATS.map(m=>`
+      <div class="cc${selMat===m.id?' on':''}" onclick="pickMat('${m.id}')">
+        <div class="ci">${selMat===m.id?'●':'○'}</div>
+        <div class="cn2">${m.name}</div>
+      </div>`).join('')}</div>`;
+
   // coatings — single select
   document.getElementById('cg').innerHTML=COATS.map(c=>`
     <div class="cc${selC===c.id?' on':''}" onclick="pickC('${c.id}')">
       <div class="ci">${selC===c.id?'●':'○'}</div>
-      <div class="cn2">${c.name}</div><div class="cd">${c.desc}</div>
+      <div class="cn2">${c.name}</div>
     </div>`).join('');
 }
 function pickL(id){selL=selL===id?null:id;renderL()}
+function pickMat(id){selMat=selMat===id?null:id;renderL()}
 function pickC(id){selC=selC===id?null:id;renderL()}
 
 // ── PRODUCTS ─────────────────────────────────────
 function renderPr(){
-  document.getElementById('pg').innerHTML=PRODS.map(p=>`
+  const pg=document.getElementById('pg');
+  if(!PRODS.length){pg.innerHTML=`<div class="empty">Поки що немає готових моделей у наявності.<br>Оформіть замовлення на вкладці «На замовлення».</div>`;return}
+  pg.innerHTML=PRODS.map(p=>`
     <div class="pc">
-      <img src="${p.img}" alt="${p.name}">
+      ${p.img?`<img src="${esc(p.img)}" alt="${esc(p.name)}">`:`<div class="pc-ph">${SVG.rect}</div>`}
       <div class="pcb">
-        <div class="pcn">${p.name}</div>
-        <div class="pcd">${p.desc}</div>
-        <div class="tags">${p.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+        <div class="pcn">${esc(p.name)}</div>
+        ${p.desc?`<div class="pcd">${esc(p.desc)}</div>`:''}
+        <div class="tags">${p.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}${p.diopters&&p.diopters.length?`<span class="tag">${esc(p.diopters[0])} … ${esc(p.diopters[p.diopters.length-1])}</span>`:''}${p.colors&&p.colors.length?`<span class="tag">${p.colors.length} кол.</span>`:''}</div>
         <button class="pbt" onclick="orderProd(${p.id})">Хочу цю модель</button>
       </div>
     </div>`).join('');
 }
 function orderProd(id){
   selProd=PRODS.find(p=>p.id===id);
+  mDiop=null;mColor=null;
+  const hasD=selProd.diopters&&selProd.diopters.length;
+  const hasC=selProd.colors&&selProd.colors.length;
   document.getElementById('mb').innerHTML=`
     <div class="mh">Замовити модель</div>
-    <div class="ms2">«${selProd.name}» — майстер привезе її до вас</div>
+    <div class="ms2">«${esc(selProd.name)}» — майстер привезе її до вас</div>
     <div class="fstack" style="margin-bottom:14px">
+      ${hasD?`<div class="ff"><label>Діоптрії *</label><select id="md"><option value="">Оберіть...</option>${selProd.diopters.map(d=>`<option value="${esc(d)}">${esc(d)}</option>`).join('')}</select></div>`:''}
+      ${hasC?`<div class="ff"><label>Колір оправи</label><div class="fr-row" id="mcolor">${selProd.colors.map((c,i)=>`<button type="button" class="ft" onclick="pickMColor(this,${i})">${esc(c)}</button>`).join('')}</div></div>`:''}
       <div class="ff"><label>Ім'я *</label><input id="mn" type="text" placeholder="Як вас звати?"></div>
       <div class="ff"><label>Телефон *</label><input id="mp" type="tel" placeholder="+380 (___) ___-__-__"></div>
-      <div class="ff"><label>Рецепт / коментар</label><textarea id="mc" placeholder="Діоптрії, побажання, зручний час..."></textarea></div>
+      <div class="ff"><label>Рецепт / коментар</label><textarea id="mc" placeholder="Побажання, зручний час, район..."></textarea></div>
     </div>
     <button class="btn btnp" style="width:100%" onclick="submitProd()">Відправити заявку</button>`;
   openMod();
+}
+function pickMColor(btn,i){
+  mColor=selProd.colors[i];
+  document.querySelectorAll('#mcolor .ft').forEach(x=>x.classList.remove('on'));
+  btn.classList.add('on');
 }
 
 // ── SUMMARY ──────────────────────────────────────
 function buildSmry(){
   const fr=selFr?FRAMES.find(f=>f.id===selFr):null;
   const ln=selL?LENSES.find(l=>l.id===selL):null;
+  const mt=selMat?MATS.find(m=>m.id===selMat):null;
   const ct=selC?COATS.find(c=>c.id===selC):null;
   const pd=pdM==='s'?rx['pd']+' мм':`ОД ${rx['pd-od']} / ОС ${rx['pd-os']} мм`;
   document.getElementById('smry').innerHTML=`
@@ -645,19 +712,11 @@ function buildSmry(){
     <div class="sr"><span class="sk">Лівий (ОС)</span><span class="sv2">${synced?'= Правий':`SPH ${fmtD(rx['os-sph'])} / CYL ${fmtD(rx['os-cyl'])} / AX ${rx['os-ax']}°`}</span></div>
     <div class="sr"><span class="sk">МЗВ</span><span class="sv2">${pd}</span></div>
     ${(selL==='prog'||selL==='bif')?`<div class="sr"><span class="sk">ADD ОД / ОС</span><span class="sv2">${fmtADD(rx['od-add'])} / ${fmtADD(rx['os-add'])}</span></div>`:''}
-    <div class="sr"><span class="sk">Оправа</span><span class="sv2">${fr?fr.name+' · '+fr.desc:'Обговоримо при зустрічі'}</span></div>
+    <div class="sr"><span class="sk">Оправа</span><span class="sv2">${fr?esc(fr.name):'Обговоримо при зустрічі'}</span></div>
+    <div class="sr"><span class="sk">Колір оправи</span><span class="sv2">${selFrColor?esc(selFrColor):'Обговоримо при зустрічі'}</span></div>
     <div class="sr"><span class="sk">Лінзи</span><span class="sv2">${ln?ln.name:'Обговоримо при зустрічі'}</span></div>
+    <div class="sr"><span class="sk">Матеріал лінз</span><span class="sv2">${mt?mt.name:'Обговоримо при зустрічі'}</span></div>
     <div class="sr"><span class="sk">Покриття</span><span class="sv2">${ct?ct.name:'Обговоримо при зустрічі'}</span></div>`;
-}
-
-// ── TELEGRAM ─────────────────────────────────────
-async function tgMsg(text){
-  if(!CFG.tok||!CFG.cid)return false;
-  try{const r=await fetch(`https://api.telegram.org/bot${CFG.tok}/sendMessage`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({chat_id:CFG.cid,text,parse_mode:'HTML'})});return r.ok}catch{return false}
-}
-async function tgPic(file,cap){
-  if(!CFG.tok||!CFG.cid)return;
-  try{const fd2=new FormData();fd2.append('chat_id',CFG.cid);fd2.append('photo',file);fd2.append('caption',cap);await fetch(`https://api.telegram.org/bot${CFG.tok}/sendPhoto`,{method:'POST',body:fd2})}catch{}
 }
 
 // ── SUBMIT MANUAL ─────────────────────────────────
@@ -668,12 +727,20 @@ async function doSubmit(){
   if(!name||!phone){alert('Будь ласка, вкажіть ім\'я і телефон');return}
   const fr=selFr?FRAMES.find(f=>f.id===selFr):null;
   const ln=selL?LENSES.find(l=>l.id===selL):null;
+  const mt=selMat?MATS.find(m=>m.id===selMat):null;
   const ct=selC?COATS.find(c=>c.id===selC):null;
   const pd=pdM==='s'?rx['pd']+' мм':`ОД ${rx['pd-od']} / ОС ${rx['pd-os']} мм`;
-  const addStr=(selL==='prog'||selL==='bif')?`\n  ADD ОД / ОС: ${fmtADD(rx['od-add'])} / ${fmtADD(rx['os-add'])}`:'';
-  const msg=`📋 <b>Нове замовлення на окуляри</b>\n\n👤 ${name}\n📞 ${phone}\n\n<b>Рецепт:</b>\n  ОД: SPH ${fmtD(rx['od-sph'])} / CYL ${fmtD(rx['od-cyl'])} / AX ${rx['od-ax']}°\n  ОС: ${synced?'= ОД':`SPH ${fmtD(rx['os-sph'])} / CYL ${fmtD(rx['os-cyl'])} / AX ${rx['os-ax']}°`}\n  МЗВ: ${pd}${addStr}\n\nОправа: ${fr?fr.name+' ('+fr.desc+')':'не обрана'}\nЛінзи: ${ln?ln.name:'не обрані'}\nПокриття: ${ct?ct.name:'не обрано'}${comment?'\n\n'+comment:''}`;
-  const btn=document.getElementById('sbtn');btn.textContent='Надсилаємо…';btn.disabled=true;
-  await tgMsg(msg);
+  const hasAdd=selL==='prog'||selL==='bif';
+  const addStr=hasAdd?`\n  ADD ОД / ОС: ${fmtADD(rx['od-add'])} / ${fmtADD(rx['os-add'])}`:'';
+  const text=`📋 <b>Нове замовлення на окуляри</b>\n\n👤 ${esc(name)}\n📞 ${esc(phone)}\n\n<b>Рецепт:</b>\n  ОД: SPH ${fmtD(rx['od-sph'])} / CYL ${fmtD(rx['od-cyl'])} / AX ${rx['od-ax']}°\n  ОС: ${synced?'= ОД':`SPH ${fmtD(rx['os-sph'])} / CYL ${fmtD(rx['os-cyl'])} / AX ${rx['os-ax']}°`}\n  МЗВ: ${pd}${addStr}\n\nОправа: ${fr?esc(fr.name):'не обрана'}\nКолір оправи: ${selFrColor?esc(selFrColor):'не обрано'}\nЛінзи: ${ln?ln.name:'не обрані'}\nМатеріал: ${mt?mt.name:'не обрано'}\nПокриття: ${ct?ct.name:'не обрано'}${comment?'\n\n'+esc(comment):''}`;
+  const payload={text,
+    rx:{od:{sph:rx['od-sph'],cyl:rx['od-cyl'],ax:rx['od-ax']},
+        os:synced?'=od':{sph:rx['os-sph'],cyl:rx['os-cyl'],ax:rx['os-ax']},
+        pd, add:hasAdd?{od:rx['od-add'],os:rx['os-add']}:null},
+    frame:fr?fr.name:null,frame_color:selFrColor,lens:ln?ln.name:null,material:mt?mt.name:null,coating:ct?ct.name:null};
+  const btn=document.getElementById('sbtn');const btnTxt=btn.textContent;btn.textContent='Надсилаємо…';btn.disabled=true;
+  const ok=await sendOrder({kind:'manual',name,phone,comment,payload});
+  if(!ok){alert('Не вдалося надіслати. Перевірте інтернет і спробуйте ще раз.');btn.textContent=btnTxt;btn.disabled=false;return}
   document.getElementById('p4').innerHTML=successHTML(name,phone);
   document.getElementById('p4').classList.add('on');
 }
@@ -683,14 +750,20 @@ async function submitProd(){
   const name=document.getElementById('mn').value.trim();
   const phone=document.getElementById('mp').value.trim();
   const comment=document.getElementById('mc').value.trim();
+  const dEl=document.getElementById('md');
+  if(dEl)mDiop=dEl.value;
   if(!name||!phone){alert('Вкажіть ім\'я і телефон');return}
-  await tgMsg(`📋 <b>Замовлення з асортименту</b>\n\n👤 ${name}\n📞 ${phone}\n🔲 ${selProd.name}${comment?'\n\n'+comment:''}`);
-  document.getElementById('mb').innerHTML=`<div class="succ"><div class="sico">✓</div><div class="sh2">Заявку прийнято</div><div class="st">Майстер зателефонує вам<br>за номером <strong>${phone}</strong></div><a class="wa" href="https://wa.me/${CFG.wa}" target="_blank">Написати в WhatsApp</a></div>`;
+  if(dEl&&!mDiop){alert('Оберіть діоптрії');return}
+  const extra=`${mDiop?'\n🔎 Діоптрії: '+esc(mDiop):''}${mColor?'\n🎨 Колір: '+esc(mColor):''}`;
+  const text=`📋 <b>Замовлення з асортименту</b>\n\n👤 ${esc(name)}\n📞 ${esc(phone)}\n🔲 ${esc(selProd.name)}${extra}${comment?'\n\n'+esc(comment):''}`;
+  const ok=await sendOrder({kind:'product',name,phone,comment,payload:{text,product:selProd.name,diopter:mDiop||null,color:mColor||null}});
+  if(!ok){alert('Не вдалося надіслати. Спробуйте ще раз.');return}
+  document.getElementById('mb').innerHTML=`<div class="succ"><div class="sico">✓</div><div class="sh2">Заявку прийнято</div><div class="st">Майстер зателефонує вам<br>за номером <strong>${esc(phone)}</strong></div><a class="wa" href="https://wa.me/${CFG.wa}" target="_blank">Написати в WhatsApp</a></div>`;
 }
 
 // ── SUCCESS ───────────────────────────────────────
 function successHTML(name,phone){
-  return`<div class="succ"><div class="sico">✓</div><div class="sh2">Замовлення відправлено</div><div class="st">${name}, майстер незабаром зателефонує вам<br>за номером <strong>${phone}</strong><br><br>Домовтеся про зручний час — майстер приїде сам.</div><a class="wa" href="https://wa.me/${CFG.wa}" target="_blank">Написати в WhatsApp</a></div>`;
+  return`<div class="succ"><div class="sico">✓</div><div class="sh2">Замовлення відправлено</div><div class="st">${esc(name)}, майстер незабаром зателефонує вам<br>за номером <strong>${esc(phone)}</strong><br><br>Домовтеся про зручний час — майстер приїде сам.</div><a class="wa" href="https://wa.me/${CFG.wa}" target="_blank">Написати в WhatsApp</a></div>`;
 }
 
 // ── MODAL ─────────────────────────────────────────
@@ -705,7 +778,7 @@ function showTab(t,b){
 }
 
 // ── INIT ──────────────────────────────────────────
-document.addEventListener('DOMContentLoaded',()=>{renderFr();renderL();renderPr()});
+document.addEventListener('DOMContentLoaded',()=>{renderL();renderFr();renderPr();loadCatalog()});
 </script>
 </body>
 </html>
